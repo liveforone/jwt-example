@@ -87,7 +87,7 @@ public class MemberController {
     @GetMapping("/member/prohibition")
     public ResponseEntity<?> prohibition() {
         return ResponseEntity
-                .ok("접근 권한이 없습니다.");
+                .ok("접근 권한이 없습니다.\n다시 로그인 하여 주세요");
     }
 
     @GetMapping("/member/my-page")
