@@ -93,6 +93,7 @@ jwt:
 * postman으로 api 사용할때에는 발급된 accessToken을 
 * headers에 key로 Authorization을 주고 value에
 * Bearer[토큰] 으로 넣어주면 된다.
+* 실무에서는 클라이언트의 localstorage에 accessToken을 저장해 사용한다.저장한다 
 
 # 5. jwt 설명
 * jwt는 JSON을 Base64를 통해 인코딩해 직렬화한 것이다.
