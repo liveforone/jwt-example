@@ -108,7 +108,31 @@ jwt:
 * 4.accessToken에 문제 없을시 응답
 * 5.refreshToken으로 accessToken재발급
 
-# 7. 정리
+# 7. 리다이렉트
+* jwt에서 리다이렉트는 조금 복잡하다.
+* 현재 가지고 있는 토큰을 꺼내서 넣어주어야하기 때문이다.
+* CommonUtils 클래스에 makeRedirect() 함수를 만들어서 이 함수를 호출하여 리다이렉트 할 수 있게 했다.
+* 해당 함수는 http method를 get으로 설정하고, 현재 토큰값을 꺼내어 집어놓고, 원하는 url에 해당 값들을 보내는 함수이다. 
+* 코드는 아래와 같다.
+```
+public static ResponseEntity<String> makeRedirect(String inputUrl, HttpServletRequest request) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        String url = "http://localhost:8080" + inputUrl;
+        String token = JwtAuthenticationFilter.resolveToken(request);
+        httpHeaders.setBearerAuth(token);
+
+        return restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(httpHeaders),
+                String.class
+        );
+}
+```
+
+# 8. 정리
 * 세션 인증은 서버가 세션정보를 가지고 있어야 하고 이를 조회하는 process가 필요하다.
 * 이러한 상태를 stateful 이라고 한다.
 * 하지만 토큰은 세션과는 달리 서버가 아닌 클라이언트에 저장된다.
