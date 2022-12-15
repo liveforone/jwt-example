@@ -1,8 +1,12 @@
 package jwtexample.jwtExample.utility;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jwtexample.jwtExample.jwt.JwtAuthenticationFilter;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-
-import java.net.URI;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 public class CommonUtils {
@@ -33,13 +37,22 @@ public class CommonUtils {
     }
 
     /*
-    * HttpHeaders 만드는 함수
-    * 리다이렉트시 ResponseEntity.header()에 넣어주면 된다.
+     * 리다이렉트 ResponseEntity를 만드는 함수
+     * input url 은 반드시 '/'로 시작해야한다.
      */
-    public static HttpHeaders makeHeader(String uri) {
+    public static ResponseEntity<String> makeRedirect(String inputUrl, HttpServletRequest request) {
+        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(URI.create(uri));
 
-        return httpHeaders;
+        String url = "http://localhost:8080" + inputUrl;
+        String token = JwtAuthenticationFilter.resolveToken(request);
+        httpHeaders.setBearerAuth(token);
+
+        return restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(httpHeaders),
+                String.class
+        );
     }
 }

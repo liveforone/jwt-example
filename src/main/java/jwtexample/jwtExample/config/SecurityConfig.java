@@ -21,7 +21,6 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    //== bcrypt pw 인코더 ==//
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -42,10 +41,7 @@ public class SecurityConfig {
                                 "/member/login"
                         ).permitAll()
                         .requestMatchers(
-                                "/admin",
-                                "/book/post",
-                                "/book/edit/**",
-                                "/book/delete/**"
+                                "/admin/**"
                         ).hasRole("ADMIN")
                         .anyRequest().authenticated()
                         .and()

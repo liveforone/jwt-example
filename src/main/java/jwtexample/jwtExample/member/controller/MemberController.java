@@ -1,15 +1,16 @@
 package jwtexample.jwtExample.member.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jwtexample.jwtExample.jwt.TokenInfo;
 import jwtexample.jwtExample.member.dto.MemberRequest;
 import jwtexample.jwtExample.member.dto.MemberResponse;
 import jwtexample.jwtExample.member.model.Member;
 import jwtexample.jwtExample.member.model.Role;
 import jwtexample.jwtExample.member.service.MemberService;
+import jwtexample.jwtExample.member.util.MemberUtils;
 import jwtexample.jwtExample.utility.CommonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,21 +27,21 @@ public class MemberController {
     private static final int NOT_DUPLICATE = 1;
     private static final int PASSWORD_MATCH = 1;
 
-    //== 메인 페이지 ==//
     @GetMapping("/")
     public ResponseEntity<?> home() {
         return ResponseEntity.ok("home");
     }
 
-    //== 회원가입 페이지 ==//
     @GetMapping("/member/signup")
     public ResponseEntity<?> signupPage() {
         return ResponseEntity.ok("회원가입페이지");
     }
 
-    //== 회원가입 처리 ==//
     @PostMapping("/member/signup")
-    public ResponseEntity<?> signup(@RequestBody MemberRequest memberRequest) {
+    public ResponseEntity<?> signup(
+            @RequestBody MemberRequest memberRequest,
+            HttpServletRequest request
+    ) {
         int checkEmail = memberService.checkDuplicateEmail(memberRequest.getEmail());
 
         if (checkEmail != NOT_DUPLICATE) {
@@ -48,25 +49,19 @@ public class MemberController {
                     .ok("중복되는 이메일이 있어 회원가입이 불가능합니다.");
         }
 
-        String url = "/";
-        HttpHeaders httpHeaders = CommonUtils.makeHeader(url);
-
         memberService.joinUser(memberRequest);
         log.info("회원 가입 성공");
 
-        return ResponseEntity
-                .status(HttpStatus.MOVED_PERMANENTLY)
-                .headers(httpHeaders)
-                .build();
+        String url = "/";
+
+        return CommonUtils.makeRedirect(url, request);
     }
 
-    //== 로그인 페이지 ==//
     @GetMapping("/member/login")
     public ResponseEntity<?> loginPage() {
         return ResponseEntity.ok("로그인 페이지");
     }
 
-    //== 로그인 ==//
     @PostMapping("/member/login")
     public TokenInfo loginPage(
             @RequestBody MemberRequest memberRequest
@@ -78,12 +73,11 @@ public class MemberController {
     }
 
     /*
-    로그아웃은 시큐리티 단에서 이루어짐.
-    url : /member/logout
-    method : POST
+    * 로그아웃은 시큐리티 단에서 이루어짐.
+    * url : /member/logout
+    * method : Get
      */
 
-    //== 접근 거부 페이지 ==//
     @GetMapping("/member/prohibition")
     public ResponseEntity<?> prohibition() {
         return ResponseEntity
@@ -98,7 +92,7 @@ public class MemberController {
 
         return ResponseEntity.ok(member);
     }
-    //== 어드민 페이지 ==//
+
     @GetMapping("/admin")
     public ResponseEntity<?> admin(Principal principal) {
         Member member = memberService.getMemberEntity(principal.getName());
@@ -114,7 +108,6 @@ public class MemberController {
         return ResponseEntity.ok(memberService.getAllMemberForAdmin());
     }
 
-    //== 회원 탈퇴 ==//
     @PostMapping("/member/withdraw")
     public ResponseEntity<?> userWithdraw(
             @RequestBody String password,
@@ -126,7 +119,7 @@ public class MemberController {
             return ResponseEntity.ok("해당 유저를 조회할 수 없어 탈퇴가 불가능합니다.");
         }
 
-        int checkPassword = memberService.checkPasswordMatching(
+        int checkPassword = MemberUtils.checkPasswordMatching(
                 password,
                 member.getPassword()
         );
