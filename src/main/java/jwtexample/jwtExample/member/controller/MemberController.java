@@ -7,6 +7,7 @@ import jwtexample.jwtExample.member.dto.MemberResponse;
 import jwtexample.jwtExample.member.model.Member;
 import jwtexample.jwtExample.member.model.Role;
 import jwtexample.jwtExample.member.service.MemberService;
+import jwtexample.jwtExample.member.util.MemberConstants;
 import jwtexample.jwtExample.member.util.MemberUtils;
 import jwtexample.jwtExample.utility.CommonUtils;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,6 @@ import java.security.Principal;
 public class MemberController {
 
     private final MemberService memberService;
-
-    private static final int NOT_DUPLICATE = 1;
-    private static final int PASSWORD_MATCH = 1;
 
     @GetMapping("/")
     public ResponseEntity<?> home() {
@@ -44,7 +42,7 @@ public class MemberController {
     ) {
         int checkEmail = memberService.checkDuplicateEmail(memberRequest.getEmail());
 
-        if (checkEmail != NOT_DUPLICATE) {
+        if (checkEmail != MemberConstants.NOT_DUPLICATE.getValue()) {
             return ResponseEntity
                     .ok("중복되는 이메일이 있어 회원가입이 불가능합니다.");
         }
@@ -124,7 +122,7 @@ public class MemberController {
                 member.getPassword()
         );
 
-        if (checkPassword != PASSWORD_MATCH) {
+        if (checkPassword != MemberConstants.PASSWORD_MATCH.getValue()) {
             log.info("비밀번호 일치하지 않음.");
             return ResponseEntity.ok("비밀번호가 다릅니다. 다시 입력해주세요.");
         }
