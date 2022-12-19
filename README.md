@@ -18,6 +18,7 @@
 
 # 2. yml 설정
 * 기존 설정값들은 그대로 쓰고 아래의 코드를 추가한다.
+* 시크릿 키는 32자 이상만되면 된다. 32자를 넘어가면 더 좋다.(아무 문자열이나 막 치면된다)
 ```
 jwt:
   secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
